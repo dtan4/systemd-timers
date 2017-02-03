@@ -8,6 +8,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/dtan4/systemd-timers/systemd"
+	"github.com/dustin/go-humanize"
 	"github.com/reconquest/loreley"
 )
 
@@ -40,7 +41,7 @@ func generateTable(timers []*systemd.Timer) (string, error) {
 			lastTriggered = "n/a"
 			result = "n/a"
 		} else {
-			lastTriggered = timer.LastTriggered.Local().String()
+			lastTriggered = fmt.Sprintf("%s (%s)", timer.LastTriggered.Local().String(), humanize.Time(timer.LastTriggered))
 
 			if timer.Result == "success" {
 				result = "<fg 2>success<reset>"

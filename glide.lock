@@ -1,10 +1,12 @@
-hash: 8d1d4e3a58bd798a1a77a28c5e91587f870d42f194a85175a724b424f406f335
-updated: 2017-02-03T15:30:40.67426516+09:00
+hash: febecaaf018d75e6486840fbc9aa955029540534ec04999e0206360e1ad3595a
+updated: 2017-02-03T18:41:17.598226732+09:00
 imports:
 - name: github.com/coreos/go-systemd
   version: 48702e0da86bd25e76cfef347e2adeb434a0d0a6
   subpackages:
   - dbus
+- name: github.com/dustin/go-humanize
+  version: 7a41df006ff9af79a29f0ffa9c5f21fbe6314a2d
 - name: github.com/fatih/color
   version: 34e4ee095d12986a2cef5ddb9aeb3b8cfcfea17c
 - name: github.com/godbus/dbus

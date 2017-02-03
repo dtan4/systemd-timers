@@ -7,3 +7,4 @@ import:
 - package: github.com/fatih/color
   version: ~1.2.0
 - package: github.com/reconquest/loreley
+- package: github.com/dustin/go-humanize
