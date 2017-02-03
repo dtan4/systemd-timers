@@ -109,7 +109,13 @@ func (c *Client) ListTimers() ([]*Timer, error) {
 				if nextElapseUSecRealtime == 0 {
 					timer.NextElapse = time.Time{}
 				} else {
-					timer.NextElapse = time.Unix(int64(nextElapseUSecRealtime)/1000/1000, 0)
+					nextElapse := time.Unix(int64(nextElapseUSecRealtime)/1000/1000, 0)
+
+					if nextElapse.After(time.Now()) {
+						timer.NextElapse = nextElapse
+					} else {
+						timer.NextElapse = time.Time{}
+					}
 				}
 			}
 		}
