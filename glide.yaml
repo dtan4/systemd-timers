@@ -1,2 +1,6 @@
 package: github.com/dtan4/systemd-timers
-import: []
+import:
+- package: github.com/coreos/go-systemd
+  version: ~14.0.0
+  subpackages:
+  - dbus
