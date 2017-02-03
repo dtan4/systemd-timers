@@ -7,15 +7,6 @@ import (
 	"github.com/dtan4/systemd-timers/systemd"
 )
 
-var (
-	headers = []string{
-		"UNIT",
-		"LAST",
-		"RESULT",
-		"NEXT",
-	}
-)
-
 func main() {
 	conn, err := systemd.NewConn()
 	if err != nil {

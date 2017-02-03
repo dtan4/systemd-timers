@@ -10,6 +10,16 @@ import (
 	"github.com/reconquest/loreley"
 )
 
+var (
+	headers = []string{
+		"UNIT",
+		"LAST",
+		"RESULT",
+		"NEXT",
+		"SCHEDULE",
+	}
+)
+
 func generateTable(timers []*systemd.Timer) (string, error) {
 	buf := &bytes.Buffer{}
 
@@ -43,6 +53,7 @@ func generateTable(timers []*systemd.Timer) (string, error) {
 			lastTriggered,
 			result,
 			nextElapse,
+			timer.Schedule,
 		}, "\t"))
 	}
 
