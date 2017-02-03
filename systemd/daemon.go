@@ -52,6 +52,26 @@ func (c *Client) ListTimers() ([]*Timer, error) {
 			return []*Timer{}, err
 		}
 
+		var execMainStartTimestamp, execMainExitTimestamp uint64
+
+		if v, ok := serviceProps["ExecMainStartTimestamp"]; ok {
+			if v2, ok2 := v.(uint64); ok2 {
+				execMainStartTimestamp = v2
+			}
+		}
+
+		if v, ok := serviceProps["ExecMainExitTimestamp"]; ok {
+			if v2, ok2 := v.(uint64); ok2 {
+				execMainExitTimestamp = v2
+			}
+		}
+
+		if execMainStartTimestamp < execMainExitTimestamp {
+			timer.LastExecutionTime = execMainExitTimestamp - execMainStartTimestamp
+		} else {
+			timer.LastExecutionTime = 0
+		}
+
 		if v, ok := serviceProps["Result"]; ok {
 			if result, ok2 := v.(string); ok2 {
 				timer.Result = result
@@ -102,12 +122,13 @@ func (c *Client) ListTimers() ([]*Timer, error) {
 
 // Timer represents systemd timer
 type Timer struct {
-	Name          string    `json:"name"`
-	Schedule      string    `json:"schedule"`
-	LastTriggered time.Time `json:"last_triggered"`
-	NextElapse    time.Time `json:"next_elapse"`
-	Result        string    `json:"result"`
-	Active        bool      `json:"active"`
+	Name              string    `json:"name"`
+	Schedule          string    `json:"schedule"`
+	LastTriggered     time.Time `json:"last_triggered"`
+	NextElapse        time.Time `json:"next_elapse"`
+	Result            string    `json:"result"`
+	Active            bool      `json:"active"`
+	LastExecutionTime uint64    `json:"last_execution_time"`
 }
 
 // NewTimer creates new Timer object
