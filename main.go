@@ -11,9 +11,10 @@ import (
 
 var (
 	headers = []string{
-		"NEXT",
-		"LAST",
 		"UNIT",
+		"LAST",
+		"RESULT",
+		"NEXT",
 	}
 )
 
@@ -37,10 +38,27 @@ func main() {
 	fmt.Fprintln(w, strings.Join(headers, "\t"))
 
 	for _, timer := range timers {
+		var lastTriggered, result, nextElapse string
+
+		if timer.LastTriggered.IsZero() {
+			lastTriggered = "n/a"
+			result = "n/a"
+		} else {
+			lastTriggered = timer.LastTriggered.Local().String()
+			result = timer.Result
+		}
+
+		if timer.NextElapse.IsZero() {
+			nextElapse = "n/a"
+		} else {
+			nextElapse = timer.NextElapse.Local().String()
+		}
+
 		fmt.Fprintln(w, strings.Join([]string{
-			timer.NextElapse.Local().String(),
-			timer.LastTriggered.Local().String(),
 			timer.UnitName,
+			lastTriggered,
+			result,
+			nextElapse,
 		}, "\t"))
 	}
 
