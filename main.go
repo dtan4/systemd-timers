@@ -45,7 +45,12 @@ func main() {
 			result = "n/a"
 		} else {
 			lastTriggered = timer.LastTriggered.Local().String()
-			result = timer.Result
+
+			if timer.Result == "exit-code" {
+				result = "failed"
+			} else {
+				result = timer.Result
+			}
 		}
 
 		if timer.NextElapse.IsZero() {
@@ -55,7 +60,7 @@ func main() {
 		}
 
 		fmt.Fprintln(w, strings.Join([]string{
-			timer.UnitName,
+			timer.Name,
 			lastTriggered,
 			result,
 			nextElapse,

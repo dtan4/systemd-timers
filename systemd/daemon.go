@@ -8,23 +8,15 @@ import (
 )
 
 const (
-	timerSuffix   = ".timer"
-	timerUnitType = "Timer"
+	serviceSuffix   = ".service"
+	serviceUnitType = "Service"
+	timerSuffix     = ".timer"
+	timerUnitType   = "Timer"
 )
 
 // Client represents systemd D-Bus API client.
 type Client struct {
 	conn *dbus.Conn
-}
-
-// Timer represents systemd timer
-type Timer struct {
-	UnitName      string    `json:"unit_name"`
-	Schedule      string    `json:"schedule"`
-	LastTriggered time.Time `json:"last_triggered"`
-	NextElapse    time.Time `json:"next_elapse"`
-	Result        string    `json:"result"`
-	Active        bool      `json:"active"`
 }
 
 // NewClient creates new Client object
@@ -53,17 +45,25 @@ func (c *Client) ListTimers() ([]*Timer, error) {
 			continue
 		}
 
-		timer := &Timer{
-			UnitName: unit.Name,
-			Active:   unit.ActiveState == "active",
-		}
+		timer := NewTimer(strings.TrimSuffix(unit.Name, timerSuffix))
 
-		props, err := c.conn.GetUnitTypeProperties(unit.Name, timerUnitType)
+		serviceProps, err := c.conn.GetUnitTypeProperties(timer.ServiceName(), serviceUnitType)
 		if err != nil {
 			return []*Timer{}, err
 		}
 
-		if v, ok := props["TimersCalendar"]; ok {
+		if v, ok := serviceProps["Result"]; ok {
+			if result, ok2 := v.(string); ok2 {
+				timer.Result = result
+			}
+		}
+
+		timerProps, err := c.conn.GetUnitTypeProperties(timer.TimerName(), timerUnitType)
+		if err != nil {
+			return []*Timer{}, err
+		}
+
+		if v, ok := timerProps["TimersCalendar"]; ok {
 			if s, ok2 := v.([][]interface{}); ok2 {
 				// []interface {}{"OnCalendar", "*-*-* 06,18:00:00", 0x5475da471b800}
 				if len(s) > 0 && len(s[0]) > 1 {
@@ -74,7 +74,7 @@ func (c *Client) ListTimers() ([]*Timer, error) {
 			}
 		}
 
-		if v, ok := props["LastTriggerUSec"]; ok {
+		if v, ok := timerProps["LastTriggerUSec"]; ok {
 			if lastTriggerUSec, ok2 := v.(uint64); ok2 {
 				if lastTriggerUSec == 0 {
 					timer.LastTriggered = time.Time{}
@@ -84,7 +84,7 @@ func (c *Client) ListTimers() ([]*Timer, error) {
 			}
 		}
 
-		if v, ok := props["NextElapseUSecRealtime"]; ok {
+		if v, ok := timerProps["NextElapseUSecRealtime"]; ok {
 			if nextElapseUSecRealtime, ok2 := v.(uint64); ok2 {
 				if nextElapseUSecRealtime == 0 {
 					timer.NextElapse = time.Time{}
@@ -94,14 +94,35 @@ func (c *Client) ListTimers() ([]*Timer, error) {
 			}
 		}
 
-		if v, ok := props["Result"]; ok {
-			if result, ok2 := v.(string); ok2 {
-				timer.Result = result
-			}
-		}
-
 		timers = append(timers, timer)
 	}
 
 	return timers, nil
+}
+
+// Timer represents systemd timer
+type Timer struct {
+	Name          string    `json:"name"`
+	Schedule      string    `json:"schedule"`
+	LastTriggered time.Time `json:"last_triggered"`
+	NextElapse    time.Time `json:"next_elapse"`
+	Result        string    `json:"result"`
+	Active        bool      `json:"active"`
+}
+
+// NewTimer creates new Timer object
+func NewTimer(name string) *Timer {
+	return &Timer{
+		Name: name,
+	}
+}
+
+// ServiceName returns service unit name
+func (t *Timer) ServiceName() string {
+	return t.Name + serviceSuffix
+}
+
+// TimerName returns timer unit name
+func (t *Timer) TimerName() string {
+	return t.Name + timerSuffix
 }
