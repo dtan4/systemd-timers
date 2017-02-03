@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
-	"text/tabwriter"
 
 	"github.com/dtan4/systemd-timers/systemd"
 )
@@ -34,38 +32,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, strings.Join(headers, "\t"))
-
-	for _, timer := range timers {
-		var lastTriggered, result, nextElapse string
-
-		if timer.LastTriggered.IsZero() {
-			lastTriggered = "n/a"
-			result = "n/a"
-		} else {
-			lastTriggered = timer.LastTriggered.Local().String()
-
-			if timer.Result == "exit-code" {
-				result = "failed"
-			} else {
-				result = timer.Result
-			}
-		}
-
-		if timer.NextElapse.IsZero() {
-			nextElapse = "n/a"
-		} else {
-			nextElapse = timer.NextElapse.Local().String()
-		}
-
-		fmt.Fprintln(w, strings.Join([]string{
-			timer.Name,
-			lastTriggered,
-			result,
-			nextElapse,
-		}, "\t"))
+	table, err := generateTable(timers)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
-	w.Flush()
+	fmt.Print(table)
 }

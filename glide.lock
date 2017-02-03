@@ -1,10 +1,18 @@
-hash: 3877fb1ad8a17f5c0c14b4628cf228a94a8af0f6029369294c3a6b929ad892ab
-updated: 2017-02-03T14:13:02.156866182+09:00
+hash: 8d1d4e3a58bd798a1a77a28c5e91587f870d42f194a85175a724b424f406f335
+updated: 2017-02-03T15:30:40.67426516+09:00
 imports:
 - name: github.com/coreos/go-systemd
   version: 48702e0da86bd25e76cfef347e2adeb434a0d0a6
   subpackages:
   - dbus
+- name: github.com/fatih/color
+  version: 34e4ee095d12986a2cef5ddb9aeb3b8cfcfea17c
 - name: github.com/godbus/dbus
   version: 4b24ebee04561bf8a3bcc09aead82062edc56778
+- name: github.com/reconquest/loreley
+  version: 2ab6b7470a54bfa9b5b0289f9b4e8fc4839838f7
+- name: golang.org/x/crypto
+  version: 1f22c0103821b9390939b6776727195525381532
+  subpackages:
+  - ssh/terminal
 testImports: []

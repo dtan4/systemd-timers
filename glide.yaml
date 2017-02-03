@@ -4,3 +4,6 @@ import:
   version: ~14.0.0
   subpackages:
   - dbus
+- package: github.com/fatih/color
+  version: ~1.2.0
+- package: github.com/reconquest/loreley
