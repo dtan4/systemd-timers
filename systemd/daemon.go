@@ -1,6 +1,7 @@
 package systemd
 
 import (
+	"regexp"
 	"strings"
 	"time"
 
@@ -32,19 +33,17 @@ func NewConn() (*dbus.Conn, error) {
 }
 
 // ListTimers returns installed systemd timers
-func (c *Client) ListTimers() ([]*Timer, error) {
+func (c *Client) ListTimers(timerName []string) ([]*Timer, error) {
 	units, err := c.conn.ListUnits()
 	if err != nil {
 		return []*Timer{}, err
 	}
 
-	timers := []*Timer{}
-
+	var timers []*Timer
 	for _, unit := range units {
-		if !strings.HasSuffix(unit.Name, timerSuffix) {
+		if !strings.HasSuffix(unit.Name, timerSuffix) || !matchTimer(unit.Name, timerName) {
 			continue
 		}
-
 		timer := NewTimer(strings.TrimSuffix(unit.Name, timerSuffix))
 
 		serviceProps, err := c.conn.GetUnitTypeProperties(timer.ServiceName(), serviceUnitType)
@@ -152,4 +151,24 @@ func (t *Timer) ServiceName() string {
 // TimerName returns timer unit name
 func (t *Timer) TimerName() string {
 	return t.Name + timerSuffix
+}
+
+func matchTimer(timerName string, timeNames []string) bool {
+	if len(timeNames) <= 0 {
+		return true
+	}
+	for _, item := range timeNames {
+		if item == timerName {
+			return true
+		}
+		if !strings.ContainsAny(item, "*") {
+			continue
+		}
+		newRegexItem := strings.Replace(item, "*", ".*", -1)
+		re := regexp.MustCompile(newRegexItem)
+		if re.Match([]byte(timerName)) {
+			return true
+		}
+	}
+	return false
 }

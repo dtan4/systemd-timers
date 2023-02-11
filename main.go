@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+
+	var timerNames []string
+	if len(os.Args) > 1 {
+		timerNames = os.Args[1:]
+	}
+
 	conn, err := systemd.NewConn()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -17,7 +23,7 @@ func main() {
 
 	client := systemd.NewClient(conn)
 
-	timers, err := client.ListTimers()
+	timers, err := client.ListTimers(timerNames)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
