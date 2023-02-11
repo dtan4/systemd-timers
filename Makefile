@@ -40,7 +40,6 @@ cross-build: deps
 
 .PHONY: deps
 deps: glide
-	glide install
 
 .PHONY: dist
 dist:
@@ -53,8 +52,11 @@ dist:
 
 .PHONY: glide
 glide:
+ifeq ($(shell go env GO111MODULE  | tr -d '[:space:]'), off)
 ifeq ($(shell command -v glide 2> /dev/null),)
 	curl https://glide.sh/get | sh
+endif
+	glide install
 endif
 
 .PHONY: install
